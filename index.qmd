@@ -116,6 +116,134 @@ While it probably can answer the whole lab for you, that would defeat the entire
 using Pkg
 lab_dir = dirname(@__FILE__)
 Pkg.activate(lab_dir)
-# Pkg.instantiate() # uncomment this the first time you run the lab to install packages, then comment it back
+ Pkg.instantiate() # uncomment this the first time you run the lab to install packages, then comment it back
 ```
 
+# YAXArrays
+
+```{julia}
+using YAXArrays: YAXArrays as YAX 
+using DimensionalData
+using DimensionalData.Lookups
+using NetCDF
+using Downloads: download
+```
+
+## Random 2x3 array
+```{julia}
+a = YAXArray(rand(2,3))
+```
+
+## 4 Dimensional Custom Array
+```{julia}
+# axes or dimensions with name and tick values
+axlist = (
+    YAX.time(range(1, 20, length=20)),
+    lon(range(1, 10, length=10)),
+    lat(range(1, 5, length=15)),
+    Variables(["temperature", "precipitation"])
+)
+
+# the actual data matching the dimensions defined in axlist
+data = rand(20, 10, 15, 2)
+
+# metadata about the array
+props = Dict(
+    "origin" => "YAXArrays.jl example",
+    "x" => "longitude",
+    "y" => "latitude",
+);
+
+a2 = YAXArray(axlist, data, props)
+```
+
+## Using At to get specific values
+```{julia}
+a2[Variables=At("temperature"), time=1].data
+```
+
+# DimensionalData
+
+## Creating an Array with numbered columns/rows
+```{julia}
+julia> A = DimArray(rand(4,5), (a=1:4, b=1:5))
+```
+
+## Array with 2 rows, 10 columns, and 3 slices
+```{julia}
+data = rand(Int8, 2, 10, 3) .|> abs
+```
+
+## Save prenamed dimensions
+```{julia}
+X(1), Y(2), Z(3)
+```
+
+## Name your own dimension
+```{julia}
+Dim{:CEVE}(543)
+```
+
+## Retrieve wrapped value
+```{julia}
+val(X(1))
+```
+
+## Random array with X rows increasing by 0.2 and abc for Y 
+```{julia}
+A = rand(X(1.0:0.2:2.0), Y([:a, :b, :c]))
+```
+
+## Use selector to choose value from specific column/row
+```{julia}
+A[X=At(1.2), Y=At(:c)]
+```
+
+## At function can also pull within a tolerance or vectors/ranges
+```{julia}
+A[X=At(0.99:0.201:1.5; atol=0.05)]
+
+A[X=At(1.2:0.2:1.5), Y=At([:a, :c])]
+```
+
+## Options can be Ordered/Unordered, Intervals/Points, and Regular/Irregular. Most of these properties are usually detected automatically, but here we create a Sampled lookup manually:
+```{julia}
+l = Sampled(10.0:10.0:100.0; order=Unordered(), span=Irregular(1.0, 10.0), sampling=Intervals(Start()))
+```
+
+## Selecting values from Array B using selectors from Array A 
+```{julia}
+A = rand(X(1.0:0.2:2.0), Y(10:2:20))
+B = rand(X(1.0:0.04:2.0), Y(20:-1:10))
+B[DimSelectors(A)]
+```
+
+## If the array lookups are not exactly aligned, near selects based on nearest neighbor logic
+```{julia}
+C = rand(X(1.0:0.007:2.0), Y(10.0:0.9:30))
+C[DimSelectors(A; selectors=Near)]
+```
+
+# YAXAArrays.jl Tutorial
+```{julia}
+url = "https://archive.unidata.ucar.edu/software/netcdf/examples/tos_O1_2001-2002.nc"
+fname = "example.nc"
+
+if !isfile(fname)
+    download(url, fname)
+end
+
+ds = open_dataset(fname)
+```
+
+## Extract SST data from data
+```{julia}
+tos = ds.tos
+```
+
+## Indexing using position integers vs named indexing 
+```{julia}
+tos[lon = 1, lat = 1]
+
+tos[lon = At(1), lat = At(-79.5)]
+```
