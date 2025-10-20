@@ -152,7 +152,7 @@ axlist = (
 )
 
 # the actual data matching the dimensions defined in axlist
-data1 = rand(20, 10, 15, 2)
+data = rand(20, 10, 15, 2)
 
 # metadata about the array
 props = Dict(
@@ -161,12 +161,12 @@ props = Dict(
     "y" => "latitude",
 );
 
-a2 = YAXArray(axlist, data1, props)
+a2 = YAXArray(axlist, data, props)
 ```
 
 ## Using At to get specific values
 ```{julia}
-a2[Variables=At("temperature"), time=1].data1
+a2[Variables=At("temperature"), time=1].data
 ```
 
 # DimensionalData
