@@ -116,7 +116,7 @@ While it probably can answer the whole lab for you, that would defeat the entire
 using Pkg
 lab_dir = dirname(@__FILE__)
 Pkg.activate(lab_dir)
-# Pkg.instantiate() # uncomment this the first time you run the lab to install packages, then comment it back
+Pkg.instantiate() # uncomment this the first time you run the lab to install packages, then comment it back
 ```
 
 # YAXArrays
@@ -183,7 +183,7 @@ data = rand(Int8, 2, 10, 3) .|> abs
 
 ## Save prenamed dimensions
 ```{julia}
-Dim{:X}(1), Dim{:Y}(2), Dim{:Z}(3) 
+DimensionalData.X(1), DimensionalData.Y(2), DimensionalData.Z(3)
 ```
 
 ## Name your own dimension
