@@ -1,7 +1,7 @@
 ---
 title: "CEVE 543 Fall 2025 Lab 6: Julia Climate Data Tools"
 subtitle: "YAXArrays.jl, NetCDF.jl, exploring CMIP6 data structure"
-author: CEVE 543 Fall 2025
+author: ak276
 date: "2025-10-17"
 type: "lab"
 module: 2
@@ -152,7 +152,7 @@ axlist = (
 )
 
 # the actual data matching the dimensions defined in axlist
-data = rand(20, 10, 15, 2)
+data1 = rand(20, 10, 15, 2)
 
 # metadata about the array
 props = Dict(
@@ -161,12 +161,12 @@ props = Dict(
     "y" => "latitude",
 );
 
-a2 = YAXArray(axlist, data, props)
+a2 = YAXArray(axlist, data1, props)
 ```
 
 ## Using At to get specific values
 ```{julia}
-a2[Variables=At("temperature"), time=1].data
+a2[Variables=At("temperature"), time=1].data1
 ```
 
 # DimensionalData
@@ -178,12 +178,12 @@ julia> A = DimArray(rand(4,5), (a=1:4, b=1:5))
 
 ## Array with 2 rows, 10 columns, and 3 slices
 ```{julia}
-data = rand(Int8, 2, 10, 3) .|> abs
+data2 = rand(Int8, 2, 10, 3) .|> abs
 ```
 
 ## Save prenamed dimensions
 ```{julia}
-DimensionalData.X(1), DimensionalData.Y(2), DimensionalData.Z(3)
+X(1), Y(2), Z(3)
 ```
 
 ## Name your own dimension
