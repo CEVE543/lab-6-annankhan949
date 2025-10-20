@@ -116,7 +116,7 @@ While it probably can answer the whole lab for you, that would defeat the entire
 using Pkg
 lab_dir = dirname(@__FILE__)
 Pkg.activate(lab_dir)
- Pkg.instantiate() # uncomment this the first time you run the lab to install packages, then comment it back
+# Pkg.instantiate() # uncomment this the first time you run the lab to install packages, then comment it back
 ```
 
 # YAXArrays
@@ -130,7 +130,10 @@ using Downloads: download
 using Zarr, Dates
 using CairoMakie, GeoMakie
 using CairoMakie.GeometryBasics
-
+using Zarr, YAXArrays
+using Dates
+using AlgebraOfGraphics
+CairoMakie.activate!()
 ```
 
 ## Random 2x3 array
@@ -180,7 +183,7 @@ data = rand(Int8, 2, 10, 3) .|> abs
 
 ## Save prenamed dimensions
 ```{julia}
-X(1), Y(2), Z(3)
+Dim{:X}(1), Dim{:Y}(2), Dim{:Z}(3) 
 ```
 
 ## Name your own dimension
@@ -271,7 +274,6 @@ collect(tos.lat)
 
 # Plotting Maps 
 ```{julia}
-using Zarr, YAXArrays
 store ="gs://cmip6/CMIP6/ScenarioMIP/DKRZ/MPI-ESM1-2-HR/ssp585/r1i1p1f1/3hr/tas/gn/v20190710/"
 g = open_dataset(zopen(store, consolidated=true))
 ```
@@ -316,11 +318,6 @@ rotate!(ax.scene, 2.5)
 fig
 ```
 
-```{julia}
-using AlgebraOfGraphics
-using CairoMakie.GeometryBasics
-CairoMakie.activate!()
-```
 
 ## Plotting first time step of dataset 
 ```{julia}
@@ -339,7 +336,6 @@ draw(plt * visual(Scatter, marker=:rect), scales(Color = (; colormap = :plasma))
 
 ## setting time frames using dates then plotting
 ```{julia}
-using Dates
 dim_time = c[time=DateTime("2015-01-01") .. DateTime("2015-01-01T21:00:00")] # subset 7 t steps
 dim_time = readcubedata(dim_time); # read into memory first!
 
