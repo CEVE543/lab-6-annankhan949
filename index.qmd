@@ -325,7 +325,7 @@ fig
 store ="gs://cmip6/CMIP6/ScenarioMIP/DKRZ/MPI-ESM1-2-HR/ssp585/r1i1p1f1/3hr/tas/gn/v20190710/"
 g = open_dataset(zopen(store, consolidated=true))
 c = g["tas"];
-dim_data = readcubedata(c[time=1]); # read into memory first
+dim_data = collect(c[time=1]); # read into memory first using collect, tutorial works in Julia REPL but not Quarto. readcubedata returns a 4D array not YAXA so Quarto throws error when trying to generate plots 
 
 #Plot with custom color scale using scatter instead of heatmap for simplicity 
 plt = data(dim_data) * mapping(:lon, :lat; color=:value)
@@ -338,7 +338,7 @@ draw(plt * visual(Scatter, marker=:rect), scales(Color = (; colormap = :plasma))
 ## setting time frames using dates then plotting
 ```{julia}
 dim_time = c[time=DateTime("2015-01-01") .. DateTime("2015-01-01T21:00:00")] # subset 7 t steps
-dim_time = readcubedata(dim_time); # read into memory first!
+dim_time = collect(dim_time); # read into memory first!
 
 plt = data(dim_time) * mapping(:lon, :lat; color = :value, layout = :time => nonnumeric)
 draw(plt * visual(Scatter, marker=:rect), scales(Color = (; colormap = :magma));
@@ -355,7 +355,7 @@ draw(plt * visual(Lines); figure=(; size=(650,400)))
 
 ## Time series can be obtained and basic statistical analysis can be run on them. First lets set up the time steps 
 ```{julia}
-dim_series = c[time=DateTime("2015-01-01") .. DateTime("2015-01-04"), lon = 150 .. 157, lat = 0..1] |> readcubedata
+dim_series = c[time=DateTime("2015-01-01") .. DateTime("2015-01-04"), lon = 150 .. 157, lat = 0..1] |> collect #this could be useful for doing chains of transformations data |> filter |> sort |> collect
 ```
 
 ## Plotting and adding basic stat analysis
