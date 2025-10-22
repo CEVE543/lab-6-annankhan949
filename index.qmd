@@ -326,10 +326,10 @@ store ="gs://cmip6/CMIP6/ScenarioMIP/DKRZ/MPI-ESM1-2-HR/ssp585/r1i1p1f1/3hr/tas/
 g = open_dataset(zopen(store, consolidated=true))
 c = g["tas"];
 dim_data = c[time=1]
-# read into memory first using readcubedata, tutorial works in Julia REPL but not Quarto. readcubedata returns a 4D array not YAXA so Quarto throws error when trying to generate plots, swapped it to collecting only when plotting.
+# read into memory first using readcubedata, tutorial works in Julia REPL but not Quarto. readcubedata returns a 4D array not YAXA so Quarto throws error when trying to generate plots, made it a lazy YAXA to render
 
 #Plot with custom color scale using scatter instead of heatmap for simplicity 
-plt = data(dim_data |> collect) * mapping(:lon, :lat; color=:value)
+plt = data(dim_data) * mapping(:lon, :lat; color=:value)
 draw(plt * visual(Scatter, marker=:rect), scales(Color = (; colormap = :plasma));
     axis = (width = 600, height = 400, limits=(0, 360, -90, 90)))
 ```
@@ -337,10 +337,10 @@ draw(plt * visual(Scatter, marker=:rect), scales(Color = (; colormap = :plasma))
 ## Faceting
 
 ## setting time frames using dates then plotting
-```{julua}
+```{julia}
 dim_time = c[time=DateTime("2015-01-01") .. DateTime("2015-01-01T21:00:00")] # subset 7 t steps
 
-plt = data(dim_time |> collect) * mapping(:lon, :lat; color = :value, layout = :time => nonnumeric)
+plt = data(dim_time) * mapping(:lon, :lat; color = :value, layout = :time => nonnumeric)
 draw(plt * visual(Scatter, marker=:rect), scales(Color = (; colormap = :magma));
     axis = (; limits=(0, 360, -90, 90)),
     figure=(; size=(900,600)))
@@ -348,7 +348,7 @@ draw(plt * visual(Scatter, marker=:rect), scales(Color = (; colormap = :magma));
 
 ## You can facet most makie plots 
 ```{julia}
-plt = data((dim_data[lon=50..59]) |> collect) * mapping(:lat, :value => "tas"; color=:value => "tas",
+plt = data((dim_data[lon=50..59])) * mapping(:lat, :value => "tas"; color=:value => "tas",
     layout = :lon => nonnumeric)
 draw(plt * visual(Lines); figure=(; size=(650,400)))
 ```
@@ -360,7 +360,7 @@ dim_series = c[time=DateTime("2015-01-01") .. DateTime("2015-01-04"), lon = 150 
 
 ## Plotting and adding basic stat analysis
 ```{julia}
-plt = data(dim_series |> collect) * mapping(:time, :value => "tas"; color=:lon => nonnumeric)
+plt = data(dim_series) * mapping(:time, :value => "tas"; color=:lon => nonnumeric)
 draw(plt * visual(ScatterLines), scales(Color = (; palette = :tableau_colorblind));
     figure=(; size=(800,400)))
 
