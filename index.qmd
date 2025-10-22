@@ -326,7 +326,15 @@ store ="gs://cmip6/CMIP6/ScenarioMIP/DKRZ/MPI-ESM1-2-HR/ssp585/r1i1p1f1/3hr/tas/
 g = open_dataset(zopen(store, consolidated=true))
 c = g["tas"];
 dim_data = c[time=1]
-# read into memory first using readcubedata, tutorial works in Julia REPL but not Quarto. readcubedata returns a 4D array not YAXA so Quarto throws error when trying to generate plots, made it a lazy YAXA to render
+# convert to YAXArray with axes
+axes = (
+    YAXArrays.time(collect(c.time)),
+    lon(collect(c.lon)),
+    lat(collect(c.lat)),
+    Variables(["tas"])  
+)
+dim_data = YAXArray(axes, dim_data)
+# read into memory first using readcubedata, tutorial works in Julia REPL but not Quarto. readcubedata returns a 4D array not YAXA so Quarto throws error when trying to generate plots, so I had to convert
 
 #Plot with custom color scale using scatter instead of heatmap for simplicity 
 plt = data(dim_data) * mapping(:lon, :lat; color=:value)
@@ -339,6 +347,7 @@ draw(plt * visual(Scatter, marker=:rect), scales(Color = (; colormap = :plasma))
 ## setting time frames using dates then plotting
 ```{julia}
 dim_time = c[time=DateTime("2015-01-01") .. DateTime("2015-01-01T21:00:00")] # subset 7 t steps
+dim_time = YAXArray(axes, dim_time)
 
 plt = data(dim_time) * mapping(:lon, :lat; color = :value, layout = :time => nonnumeric)
 draw(plt * visual(Scatter, marker=:rect), scales(Color = (; colormap = :magma));
@@ -355,7 +364,10 @@ draw(plt * visual(Lines); figure=(; size=(650,400)))
 
 ## Time series can be obtained and basic statistical analysis can be run on them. First lets set up the time steps
 ```{julia} 
-dim_series = c[time=DateTime("2015-01-01") .. DateTime("2015-01-04"), lon = 150 .. 157, lat = 0..1] #this could be useful for doing chains of transformations data |> filter |> sort |> collect
+dim_series = c[time=DateTime("2015-01-01") .. DateTime("2015-01-04"), lon = 150 .. 157, lat = 0..1]
+
+dim_series = YAXArray(axes, dim_series)
+#this could be useful for doing chains of transformations data |> filter |> sort |> collect. Originally |> readcubedata was here
 ```
 
 ## Plotting and adding basic stat analysis
