@@ -134,7 +134,6 @@ using CairoMakie.GeometryBasics
 using Zarr
 using Dates
 using AlgebraOfGraphics
-using GLMakie
 CairoMakie.activate!()
 ```
 
