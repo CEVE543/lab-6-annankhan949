@@ -116,21 +116,22 @@ While it probably can answer the whole lab for you, that would defeat the entire
 using Pkg
 lab_dir = dirname(@__FILE__)
 Pkg.activate(lab_dir)
-#Pkg.instantiate() # uncomment this the first time you run the lab to install packages, then comment it back
+Pkg.instantiate() # uncomment this the first time you run the lab to install packages, then comment it back
 ```
 
 # YAXArrays
 
 ```{julia}
 using YAXArrays: YAXArrays as YAX 
+using YAXArrays
 using DimensionalData
 using DimensionalData.Lookups
 using NetCDF
 using Downloads: download
-using Zarr, Dates
+using Dates
 using CairoMakie, GeoMakie
 using CairoMakie.GeometryBasics
-using Zarr, YAXArrays
+using Zarr
 using Dates
 using AlgebraOfGraphics
 CairoMakie.activate!()
