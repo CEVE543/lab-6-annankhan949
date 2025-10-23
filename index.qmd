@@ -325,49 +325,55 @@ fig
 store ="gs://cmip6/CMIP6/ScenarioMIP/DKRZ/MPI-ESM1-2-HR/ssp585/r1i1p1f1/3hr/tas/gn/v20190710/"
 g = open_dataset(zopen(store, consolidated=true))
 c = g["tas"];
+```
+
+```{julia}
 dim_data = readcubedata(c[time=1]);
 # read into memory first using readcubedata, 
+```
 
+# Below is commented out due to an issue with the data() function not accepting the YAXA Array
+```{julia}
 #Plot with custom color scale using scatter instead of heatmap for simplicity 
-plt = data(dim_data) * mapping(:lon, :lat; color=:value)
-draw(plt * visual(Scatter, marker=:rect), scales(Color = (; colormap = :plasma));
-    axis = (width = 600, height = 400, limits=(0, 360, -90, 90)))
+#plt = data(dim_data) * mapping(:lon, :lat; color=:value)
+#draw(plt * visual(Scatter, marker=:rect), scales(Color = (; colormap = :plasma));
+    #axis = (width = 600, height = 400, limits=(0, 360, -90, 90)))
 ```
 
 ## Faceting
 
 ## setting time frames using dates then plotting
 ```{julia}
-dim_time = c[time=DateTime("2015-01-01") .. DateTime("2015-01-01T21:00:00")] # subset 7 t steps
-dim_time = readcubedata(dim_time);
+#dim_time = c[time=DateTime("2015-01-01") .. DateTime("2015-01-01T21:00:00")] # subset 7 t steps
+#dim_time = readcubedata(dim_time);
 
-plt = data(dim_time) * mapping(:lon, :lat; color = :value, layout = :time => nonnumeric)
-draw(plt * visual(Scatter, marker=:rect), scales(Color = (; colormap = :magma));
-    axis = (; limits=(0, 360, -90, 90)),
-    figure=(; size=(900,600)))
+#plt = data(dim_time) * mapping(:lon, :lat; color = :value, layout = :time => nonnumeric)
+#draw(plt * visual(Scatter, marker=:rect), scales(Color = (; colormap = :magma));
+    #axis = (; limits=(0, 360, -90, 90)),
+    #figure=(; size=(900,600)))
 ```
 
 ## You can facet most makie plots 
 ```{julia}
-plt = data((dim_data[lon=50..59])) * mapping(:lat, :value => "tas"; color=:value => "tas",
-    layout = :lon => nonnumeric)
-draw(plt * visual(Lines); figure=(; size=(650,400)))
+#plt = data(dim_data[lon=50..59])) * mapping(:lat, :value => "tas"; color=:value => "tas",
+    #layout = :lon => nonnumeric)
+#draw(plt * visual(Lines); figure=(; size=(650,400)))
 ```
 
 ## Time series can be obtained and basic statistical analysis can be run on them. First lets set up the time steps
 ```{julia} 
-dim_series = c[time=DateTime("2015-01-01") .. DateTime("2015-01-04"), lon = 150 .. 157, lat = 0..1] |> readcubedata
+#dim_series = c[time=DateTime("2015-01-01") .. DateTime("2015-01-04"), lon = 150 .. 157, lat = 0..1] |> readcubedata
 
 #this could be useful for doing chains of transformations data |> filter |> sort |> collect. 
 ```
 
 ## Plotting and adding basic stat analysis
 ```{julia}
-plt = data(dim_series) * mapping(:time, :value => "tas"; color=:lon => nonnumeric)
-draw(plt * visual(ScatterLines), scales(Color = (; palette = :tableau_colorblind));
-    figure=(; size=(800,400)))
+#plt = data(dim_series) * mapping(:time, :value => "tas"; color=:lon => nonnumeric)
+#draw(plt * visual(ScatterLines), scales(Color = (; palette = :tableau_colorblind));
+    #figure=(; size=(800,400)))
 
-specs = data((dim_data[lat=50..55]) |> collect) * mapping(:lon, :value => "tas"; color=:lat => nonnumeric)
-specs *= (smooth() + visual(Scatter))
-draw(specs;  figure=(; size=(700,400)))
+#specs = data((dim_data[lat=50..55]) |> collect) * mapping(:lon, :value => "tas"; color=:lat => nonnumeric)
+#specs *= (smooth() + visual(Scatter))
+#draw(specs;  figure=(; size=(700,400)))
 ```
